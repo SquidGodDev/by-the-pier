@@ -11,9 +11,10 @@ function FishingRod:init()
     self.rodLength = 12
     self.endAngle = 290
     self.backArc = pd.geometry.arc.new(0, 0, self.rodLength, 45, self.endAngle, false)
-    self.forwardArc = pd.geometry.arc.new(0, 0, self.rodLength, self.endAngle, 70, true)
-    self.castBackTime = 700
-    self.castForwardTime = 300
+    self.forwardArc = pd.geometry.arc.new(0, 0, self.rodLength, self.endAngle, 50, true)
+    self.castBackTime = 400
+    self.castForwardTime = 500
+    self.castingBack = true
 
     self.drawPadding = 2
     local rodEndX, rodEndY = self.backArc:pointOnArc(0):unpack()
@@ -36,24 +37,32 @@ function FishingRod:drawRod()
 end
 
 function FishingRod:cast()
-    if self.rodAnimator then
+    if not self.castingBack then
+        return
+    end
+    self.rodAnimator = gfx.animator.new(self.castForwardTime, self.forwardArc, pd.easingFunctions.inCubic)
+    self.castingBack = false
+end
+
+function FishingRod:castBack()
+    if self.fishingLine or self.rodAnimator then
         return
     end
     self.rodAnimator = gfx.animator.new(self.castBackTime, self.backArc, pd.easingFunctions.outCubic)
-    self.castingBack = true
-    if self.fishingLine then
-        self.fishingLine:remove()
-    end
 end
 
-function FishingRod:getLineAtAngle(angle, length)
-    local x2 = math.ceil(math.cos(math.rad(angle)) * length)
-    local y2 = math.ceil(math.sin(math.rad(angle)) * length)
-    return x2, y2
+function FishingRod:reeledIn()
+    if self.fishingLine then
+        self.fishingLine:remove()
+        self.fishingLine = nil
+        self.castingBack = true
+    end
 end
 
 function FishingRod:update()
     if pd.buttonJustPressed(pd.kButtonA) then
+        self:castBack()
+    elseif pd.buttonJustReleased(pd.kButtonA) then
         self:cast()
     end
 
@@ -62,16 +71,12 @@ function FishingRod:update()
         self.rodEndX = rodEndPoint.x
         self.rodEndY = rodEndPoint.y
         if self.rodAnimator:ended() then
-            if self.castingBack then
+            if not self.castingBack then
                 -- Todo: Scale cast forward time with cast strength
-                self.rodAnimator = gfx.animator.new(self.castForwardTime, self.forwardArc, pd.easingFunctions.inCubic)
-                self.castingBack = false
-            else
                 local worldSpaceX = self.handX + self.rodEndX
                 local worldSpaceY = self.handY + self.rodEndY
                 local castStrength = math.random(2, 9)
-                print(castStrength)
-                self.fishingLine = FishingLine(worldSpaceX, worldSpaceY, castStrength, 45)
+                self.fishingLine = FishingLine(self, worldSpaceX, worldSpaceY, castStrength, 45)
                 self.rodAnimator = nil
             end
         end

@@ -3,7 +3,8 @@ local gfx <const> = pd.graphics
 
 class('FishingLine').extends(gfx.sprite)
 
-function FishingLine:init(rodX, rodY, strength, angle)
+function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
+    self.fishingRod = fishingRod
     self.waterLevel = 198
     self.strength = strength
     self.rodX = rodX
@@ -15,6 +16,7 @@ function FishingLine:init(rodX, rodY, strength, angle)
     self.casting = true
 
     self.reelSpeed = 3
+    self.reelingUp = false
 
     self:setCenter(0, 0)
     self:moveTo(0, 0)
@@ -29,6 +31,11 @@ function FishingLine:drawLine()
     self:setImage(lineImage)
 end
 
+function FishingLine:reelUp()
+    self.hookX = self.rodX
+    self.reelingUp = true
+end
+
 function FishingLine:update()
     if self.casting then
         self.yVelocity += 9.8/30
@@ -41,10 +48,22 @@ function FishingLine:update()
             self.casting = false
         end
     else
-        local crankInput = pd.getCrankTicks(12)
-        if crankInput ~= 0 then
-            if self.hookX >= self.rodX then
-                self.hookX -= 1
+        if self.reelingUp then
+            self.hookY -= 3
+            if self.hookY <= self.rodY then
+                self.hookY = self.rodY
+                self.fishingRod:reeledIn()
+            end
+        else
+            -- Adjust crank ticks based on difficulty of fish?
+            -- Increase hookX to simulate fish pulling
+            local crankInput = pd.getCrankTicks(18)
+            if crankInput ~= 0 then
+                if self.hookX > self.rodX then
+                    self.hookX -= self.reelSpeed
+                else
+                    self:reelUp()
+                end
             end
         end
     end
