@@ -14,7 +14,6 @@ local accelTextSprite = gfx.sprite.new()
 
 local function initialize()
     math.randomseed(pd.getSecondsSinceEpoch())
-    pd.startAccelerometer()
     -- accelTextSprite:add()
     -- accelTextSprite:moveTo(150, 120)
     Water()

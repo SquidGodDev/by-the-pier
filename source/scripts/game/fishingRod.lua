@@ -51,6 +51,61 @@ function FishingRod:castBack()
     self.rodAnimator = gfx.animator.new(self.castBackTime, self.backArc, pd.easingFunctions.outCubic)
 end
 
+function FishingRod:throwLine()
+    -- Todo: Scale cast forward time with cast strength
+    local worldSpaceX = self.handX + self.rodEndX
+    local worldSpaceY = self.handY + self.rodEndY
+    local averageSpeed = 0
+
+    if #self.accelerometerValues > 0 then
+        if #self.accelerometerValues > 10 then
+            local shortenedValueArray = {}
+            for i=1,10 do
+                shortenedValueArray[i] = self.accelerometerValues[i]
+            end
+            self.accelerometerValues = shortenedValueArray
+        end
+
+        local firstPositiveIndex = 1
+        local curDiff = self.accelerometerValues[1]
+        while curDiff <= 0 and firstPositiveIndex < #self.accelerometerValues do
+            firstPositiveIndex += 1
+            curDiff = self.accelerometerValues[firstPositiveIndex]
+        end
+
+        local lastPositiveIndex = firstPositiveIndex
+        if lastPositiveIndex < #self.accelerometerValues then
+            curDiff = self.accelerometerValues[lastPositiveIndex + 1]
+            while lastPositiveIndex < #self.accelerometerValues and curDiff > 0 do
+                lastPositiveIndex += 1
+                curDiff = self.accelerometerValues[lastPositiveIndex + 1]
+            end
+        end
+
+        print("PRE")
+        printTable(self.accelerometerValues)
+        local splicedTable = {}
+        local differenceSum = 0
+        for i=firstPositiveIndex,lastPositiveIndex do
+            table.insert(splicedTable, self.accelerometerValues[i])
+            differenceSum += self.accelerometerValues[i]
+        end
+        print("POST")
+        printTable(splicedTable)
+        averageSpeed = differenceSum / (lastPositiveIndex - firstPositiveIndex + 1)
+        print("AVERAGE SPEED: " .. averageSpeed)
+    end
+    if averageSpeed < 0 then
+        averageSpeed = 0
+    elseif averageSpeed > 1 then
+        averageSpeed = 1
+    end
+    local castStrength = averageSpeed * 8 + 1
+    print("CAST STRENGTH: " .. castStrength)
+    self.fishingLine = FishingLine(self, worldSpaceX, worldSpaceY, castStrength, 45)
+    self.rodAnimator = nil
+end
+
 function FishingRod:reeledIn()
     if self.fishingLine then
         self.fishingLine:remove()
@@ -61,9 +116,18 @@ end
 
 function FishingRod:update()
     if pd.buttonJustPressed(pd.kButtonA) then
+        self.accelerometerValues = {}
+        pd.startAccelerometer()
+        local x, y, z = pd.readAccelerometer()
+        self.currentZ = z
         self:castBack()
+    elseif pd.buttonIsPressed(pd.kButtonA) then
+        local x, y, z = pd.readAccelerometer()
+        table.insert(self.accelerometerValues, 1, z - self.currentZ)
+        self.currentZ = z
     elseif pd.buttonJustReleased(pd.kButtonA) then
         self:cast()
+        pd.stopAccelerometer()
     end
 
     if self.rodAnimator then
@@ -72,12 +136,7 @@ function FishingRod:update()
         self.rodEndY = rodEndPoint.y
         if self.rodAnimator:ended() then
             if not self.castingBack then
-                -- Todo: Scale cast forward time with cast strength
-                local worldSpaceX = self.handX + self.rodEndX
-                local worldSpaceY = self.handY + self.rodEndY
-                local castStrength = math.random(2, 9)
-                self.fishingLine = FishingLine(self, worldSpaceX, worldSpaceY, castStrength, 45)
-                self.rodAnimator = nil
+                self:throwLine()
             end
         end
     end
