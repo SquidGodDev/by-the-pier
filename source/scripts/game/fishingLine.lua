@@ -21,8 +21,11 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self.reelingUp = false
     self.reelUpSpeed = 3
 
+    self.topYOffset = 50
+    self.bottomYOffset = 30
+
     self:setCenter(0, 0)
-    self:moveTo(0, 0)
+    self:moveTo(self.rodX, self.topYOffset)
     self:add()
 end
 
@@ -30,9 +33,9 @@ function FishingLine:drawLine()
     if self.lastX ~= self.hookX or self.lastY ~= self.hookY then
         self.lastX = self.hookX
         self.lastY = self.hookY
-        local lineImage = gfx.image.new(400, 240)
+        local lineImage = gfx.image.new(400 - self.rodX, 240 - self.topYOffset - self.bottomYOffset)
         gfx.pushContext(lineImage)
-            gfx.drawLine(self.rodX, self.rodY, self.hookX, self.hookY)
+            gfx.drawLine(self.rodX - self.rodX, self.rodY - self.topYOffset, self.hookX - self.rodX, self.hookY - self.topYOffset)
         gfx.popContext()
         self:setImage(lineImage)
     end
