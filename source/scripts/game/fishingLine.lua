@@ -1,3 +1,5 @@
+import "scripts/game/fishManager"
+
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
@@ -20,6 +22,8 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self.reelSpeed = 3
     self.reelingUp = false
     self.reelUpSpeed = 3
+
+    self.fishCaught = false
 
     self.topYOffset = 50
     self.bottomYOffset = 30
@@ -57,6 +61,7 @@ function FishingLine:update()
             self.yVelocity = 0
             self.casting = false
             self.fishingRod.water:impulse(self.hookX)
+            self.fishManager = FishManager(self.rodX - self.hookX)
         end
     else
         if self.reelingUp then
@@ -66,6 +71,14 @@ function FishingLine:update()
                 self.fishingRod:reeledIn()
             end
         else
+            if self.fishHooked then
+                self.hookX += self.fishManager:getPullStrength()
+            else
+                if self.fishManager:isHooked() then
+                    self.fishHooked = true
+                    self.fishingRod.water:impulse(self.hookX)
+                end
+            end
             -- Adjust crank ticks based on difficulty of fish?
             -- Increase hookX to simulate fish pulling
             local crankInput = pd.getCrankTicks(18)
