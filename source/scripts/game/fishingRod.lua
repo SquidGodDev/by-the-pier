@@ -20,20 +20,26 @@ function FishingRod:init()
     local rodEndX, rodEndY = self.backArc:pointOnArc(0):unpack()
     self.rodEndX = rodEndX
     self.rodEndY = rodEndY
+    self.lastRodEndX = -1
+    self.lastRodEndY = -1
 
     self:moveTo(self.handX, self.handY)
     self:add()
 end
 
 function FishingRod:drawRod()
-    local rodImage = gfx.image.new(self.rodLength * 2 + self.drawPadding, self.rodLength * 2 + self.drawPadding)
-    gfx.pushContext(rodImage)
-        gfx.setLineWidth(2)
-        gfx.setLineCapStyle(gfx.kLineCapStyleRound)
-        local imageCenter = self.rodLength + self.drawPadding
-        gfx.drawLine(imageCenter, imageCenter, self.rodEndX + imageCenter, self.rodEndY + imageCenter)
-    gfx.popContext()
-    self:setImage(rodImage)
+    if self.lastRodEndX ~= self.rodEndX or self.lastRodEndY ~= self.rodEndY then
+        self.lastRodEndX = self.rodEndX
+        self.lastRodEndY = self.rodEndY
+        local rodImage = gfx.image.new(self.rodLength * 2 + self.drawPadding, self.rodLength * 2 + self.drawPadding)
+        gfx.pushContext(rodImage)
+            gfx.setLineWidth(2)
+            gfx.setLineCapStyle(gfx.kLineCapStyleRound)
+            local imageCenter = self.rodLength + self.drawPadding
+            gfx.drawLine(imageCenter, imageCenter, self.rodEndX + imageCenter, self.rodEndY + imageCenter)
+        gfx.popContext()
+        self:setImage(rodImage)
+    end
 end
 
 function FishingRod:cast()
@@ -82,18 +88,13 @@ function FishingRod:throwLine()
             end
         end
 
-        print("PRE")
-        printTable(self.accelerometerValues)
         local splicedTable = {}
         local differenceSum = 0
         for i=firstPositiveIndex,lastPositiveIndex do
             table.insert(splicedTable, self.accelerometerValues[i])
             differenceSum += self.accelerometerValues[i]
         end
-        print("POST")
-        printTable(splicedTable)
         averageSpeed = differenceSum / (lastPositiveIndex - firstPositiveIndex + 1)
-        print("AVERAGE SPEED: " .. averageSpeed)
     end
     if averageSpeed < 0 then
         averageSpeed = 0
@@ -101,7 +102,6 @@ function FishingRod:throwLine()
         averageSpeed = 1
     end
     local castStrength = averageSpeed * 8 + 1
-    print("CAST STRENGTH: " .. castStrength)
     self.fishingLine = FishingLine(self, worldSpaceX, worldSpaceY, castStrength, 45)
     self.rodAnimator = nil
 end

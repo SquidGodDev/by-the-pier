@@ -16,8 +16,8 @@ local function initialize()
     math.randomseed(pd.getSecondsSinceEpoch())
     -- accelTextSprite:add()
     -- accelTextSprite:moveTo(150, 120)
-    Water()
     FishingRod()
+    Water()
     local backgroundImage = gfx.image.new("images/game/background")
     gfx.sprite.setBackgroundDrawingCallback(
         function(x, y, width, height)
@@ -47,4 +47,5 @@ function pd.update()
 
     gfx.sprite.update()
     pd.timer.updateTimers()
+    pd.drawFPS(10, 10)
 end

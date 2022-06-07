@@ -11,12 +11,15 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self.rodY = rodY
     self.hookX = rodX
     self.hookY = rodY
+    self.lastX = -1
+    self.lastY = -1
     self.xVelocity = math.cos(math.rad(angle)) * strength
     self.yVelocity = -math.sin(math.rad(angle)) * strength
     self.casting = true
 
     self.reelSpeed = 3
     self.reelingUp = false
+    self.reelUpSpeed = 3
 
     self:setCenter(0, 0)
     self:moveTo(0, 0)
@@ -24,11 +27,15 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
 end
 
 function FishingLine:drawLine()
-    local lineImage = gfx.image.new(400, 240)
-    gfx.pushContext(lineImage)
-        gfx.drawLine(self.rodX, self.rodY, self.hookX, self.hookY)
-    gfx.popContext()
-    self:setImage(lineImage)
+    if self.lastX ~= self.hookX or self.lastY ~= self.hookY then
+        self.lastX = self.hookX
+        self.lastY = self.hookY
+        local lineImage = gfx.image.new(400, 240)
+        gfx.pushContext(lineImage)
+            gfx.drawLine(self.rodX, self.rodY, self.hookX, self.hookY)
+        gfx.popContext()
+        self:setImage(lineImage)
+    end
 end
 
 function FishingLine:reelUp()
@@ -49,7 +56,7 @@ function FishingLine:update()
         end
     else
         if self.reelingUp then
-            self.hookY -= 3
+            self.hookY -= self.reelUpSpeed
             if self.hookY <= self.rodY then
                 self.hookY = self.rodY
                 self.fishingRod:reeledIn()
@@ -59,7 +66,7 @@ function FishingLine:update()
             -- Increase hookX to simulate fish pulling
             local crankInput = pd.getCrankTicks(18)
             if crankInput ~= 0 then
-                if self.hookX > self.rodX then
+                if self.hookX > self.rodX + 3 then
                     self.hookX -= self.reelSpeed
                 else
                     self:reelUp()
