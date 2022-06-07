@@ -53,6 +53,7 @@ function FishingLine:update()
             self.xVelocity = 0
             self.yVelocity = 0
             self.casting = false
+            self.fishingRod.water:impulse(self.hookX)
         end
     else
         if self.reelingUp then

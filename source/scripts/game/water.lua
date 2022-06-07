@@ -16,6 +16,25 @@ function Water:init()
     self:add()
 end
 
+function Water:impulse(hookX)
+    local closestPoint = nil
+    local closestDistance = nil
+    for _,p in ipairs(wavePoints) do
+        local distance = math.abs(hookX-p.x)
+        if closestDistance == nil then
+            closestPoint = p
+            closestDistance = distance
+        else
+            if distance <= closestDistance then
+                closestPoint = p
+                closestDistance = distance
+            end
+        end
+    end
+
+    closestPoint.y += (hookX / 12)
+end
+
 function Water:update()
     self.offset = self.offset + 1
     updateWavePoints(wavePoints)
@@ -56,7 +75,7 @@ local Y_OFFSET = 190
 local DAMPING = 0.98
 -- Number of iterations of point-influences-point to do on wave per step
 -- (this makes the waves animate faster)
-local ITERATIONS = 1
+local ITERATIONS = 3
 
 -- Make points to go on the wave
 function makeWavePoints(numPoints)

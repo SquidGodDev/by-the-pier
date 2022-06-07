@@ -10,14 +10,15 @@ import "scripts/game/water"
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
+math.randomseed(pd.getSecondsSinceEpoch())
+
 local accelTextSprite = gfx.sprite.new()
 
 local function initialize()
-    math.randomseed(pd.getSecondsSinceEpoch())
     -- accelTextSprite:add()
     -- accelTextSprite:moveTo(150, 120)
-    FishingRod()
-    Water()
+    local water = Water()
+    FishingRod(water)
     local backgroundImage = gfx.image.new("images/game/background")
     gfx.sprite.setBackgroundDrawingCallback(
         function(x, y, width, height)
