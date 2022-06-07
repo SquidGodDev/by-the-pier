@@ -33,7 +33,7 @@ function Water:update()
                 local rectWidth = x2 - x1
                 local rectX = x1 + rectWidth / 2
                 local rectY = y2
-                gfx.fillRect(rectX, rectY - self.yOffset, rectWidth, rectHeight)
+                gfx.fillRect(rectX, rectY - self.yOffset, rectWidth + 1, rectHeight)
                 gfx.setColor(gfx.kColorBlack)
                 gfx.drawLine(x1, y1 - self.yOffset, x2, y2 - self.yOffset)
             end
