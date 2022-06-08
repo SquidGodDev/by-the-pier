@@ -73,6 +73,9 @@ function FishingLine:update()
         else
             if self.fishHooked then
                 self.hookX += self.fishManager:getPullStrength()
+                if self.hookX >= 400 then
+                    self.hookX = 400
+                end
             else
                 if self.fishManager:isHooked() then
                     self.fishHooked = true
