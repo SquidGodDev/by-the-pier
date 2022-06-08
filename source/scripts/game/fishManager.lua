@@ -12,6 +12,14 @@ function FishManager:init(distance)
     end)
 end
 
+-- Fish Variables:
+-- 1. TensionRate
+-- 2. Inital Tension
+-- 3. Time to catch
+-- 4. Pull speed
+-- 5. Probability of catch
+-- 6. Name
+-- 7. Distance to be caught at
 function FishManager:getFishInfo()
     
 end

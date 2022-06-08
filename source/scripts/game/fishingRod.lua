@@ -107,7 +107,7 @@ function FishingRod:throwLine()
     self.rodAnimator = nil
 end
 
-function FishingRod:reeledIn()
+function FishingRod:reeledIn(fish)
     if self.fishingLine then
         self.fishingLine:remove()
         self.fishingLine = nil
