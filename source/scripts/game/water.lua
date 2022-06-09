@@ -1,67 +1,8 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
-class('Water').extends(gfx.sprite)
-
-function Water:init()
-    -- A phase difference to apply to each sine
-    self.offset = 0
-
-    local waterImage = gfx.image.new("images/game/water")
-    self:setImage(waterImage)
-    self:setZIndex(300)
-    self:setCenter(0, 0)
-    self.yOffset = 170
-    self:moveTo(-20, self.yOffset)
-    self:add()
-end
-
-function Water:impulse(hookX)
-    local closestPoint = nil
-    local closestDistance = nil
-    for _,p in ipairs(wavePoints) do
-        local distance = math.abs(hookX-p.x)
-        if closestDistance == nil then
-            closestPoint = p
-            closestDistance = distance
-        else
-            if distance <= closestDistance then
-                closestPoint = p
-                closestDistance = distance
-            end
-        end
-    end
-
-    closestPoint.y += (hookX / 12)
-end
-
-function Water:update()
-    self.offset = self.offset + 1
-    updateWavePoints(wavePoints)
-    local waterImage = gfx.image.new(450, 240 - self.yOffset - 20)
-    gfx.pushContext(waterImage)
-        for n,p in ipairs(wavePoints) do
-            if n ~= 1 then
-                local leftPoint = wavePoints[n-1]
-                local x1 = leftPoint.x
-                local y1 = leftPoint.y + self:overlapSines(leftPoint.x)
-                local x2 = p.x
-                local y2 = p.y + self:overlapSines(p.x)
-                gfx.setColor(gfx.kColorWhite)
-                local rectHeight = 20
-                local rectWidth = x2 - x1
-                local rectX = x1 + rectWidth / 2
-                local rectY = y2
-                gfx.fillRect(rectX, rectY - self.yOffset, rectWidth + 1, rectHeight)
-                gfx.setColor(gfx.kColorBlack)
-                gfx.drawLine(x1, y1 - self.yOffset, x2, y2 - self.yOffset)
-            end
-        end
-    gfx.popContext()
-    self:setImage(waterImage)
-end
-
 -- Resolution of simulation
+-- local NUM_POINTS = 40
 local NUM_POINTS = 40
 -- Width of simulation
 local WIDTH = 450
@@ -75,23 +16,7 @@ local Y_OFFSET = 190
 local DAMPING = 0.98
 -- Number of iterations of point-influences-point to do on wave per step
 -- (this makes the waves animate faster)
-local ITERATIONS = 3
-
--- Make points to go on the wave
-function makeWavePoints(numPoints)
-    local t = {}
-    for n = 1,numPoints do
-        -- This represents a point on the wave
-        local newPoint = {
-            x    = n / numPoints * WIDTH,
-            y    = Y_OFFSET,
-            spd = {y=0}, -- speed with vertical component zero
-            mass = 1
-        }
-        t[n] = newPoint
-    end
-    return t
-end
+local ITERATIONS = 2
 
 local NUM_BACKGROUND_WAVES = 7
 local BACKGROUND_WAVE_MAX_HEIGHT = 2
@@ -111,13 +36,87 @@ for i=1,NUM_BACKGROUND_WAVES do
     table.insert(sineStretches, math.random()*BACKGROUND_WAVE_COMPRESSION)
     table.insert(offsetStretches, math.random()*BACKGROUND_WAVE_COMPRESSION)
 end
--- This function sums together the sines generated above,
--- given an input value x
 
-wavePoints = makeWavePoints(NUM_POINTS)
+class('Water').extends(gfx.sprite)
+
+function Water:init()
+    -- A phase difference to apply to each sine
+    self.offset = 0
+
+    local waterImage = gfx.image.new("images/game/water")
+    self:setImage(waterImage)
+    self:setZIndex(300)
+    self:setCenter(0, 0)
+    self.yOffset = 170
+    self:moveTo(-20, self.yOffset)
+    self:add()
+
+    self.wavePoints = self:makeWavePoints(NUM_POINTS)
+end
+
+function Water:impulse(hookX)
+    local closestPoint = nil
+    local closestDistance = nil
+    for _,p in ipairs(self.wavePoints) do
+        local distance = math.abs(hookX-p.x)
+        if closestDistance == nil then
+            closestPoint = p
+            closestDistance = distance
+        else
+            if distance <= closestDistance then
+                closestPoint = p
+                closestDistance = distance
+            end
+        end
+    end
+
+    closestPoint.y += (hookX / 12)
+end
+
+function Water:update()
+    self.offset = self.offset + 1
+    self:updateWavePoints(self.wavePoints)
+    local waterImage = gfx.image.new(450, 240 - self.yOffset - 20)
+    gfx.pushContext(waterImage)
+        for n,p in ipairs(self.wavePoints) do
+            if n ~= 1 then
+                local leftPoint = self.wavePoints[n-1]
+                local x1 = leftPoint.x
+                local y1 = leftPoint.y + self:overlapSines(leftPoint.x)
+                local x2 = p.x
+                local y2 = p.y + self:overlapSines(p.x)
+                gfx.setColor(gfx.kColorWhite)
+                local rectHeight = 20
+                local rectWidth = x2 - x1
+                local rectX = x1 + rectWidth / 2
+                local rectY = y2
+                gfx.fillRect(rectX, rectY - self.yOffset, rectWidth + 1, rectHeight)
+                gfx.setColor(gfx.kColorBlack)
+                gfx.drawLine(x1, y1 - self.yOffset, x2, y2 - self.yOffset)
+            end
+        end
+    gfx.popContext()
+    self:setImage(waterImage)
+end
+
+-- Make points to go on the wave
+function Water:makeWavePoints(numPoints)
+    local t = {}
+    for n = 1,numPoints do
+        -- This represents a point on the wave
+        local newPoint = {
+            x    = n / numPoints * WIDTH,
+            y    = Y_OFFSET,
+            spd = {y=0}, -- speed with vertical component zero
+            mass = 1
+        }
+        t[n] = newPoint
+    end
+    return t
+end
 
 -- Update the positions of each wave point
-function updateWavePoints(points)
+function Water:updateWavePoints(points)
     for i=1,ITERATIONS do
         for n,p in ipairs(points) do
             -- force to apply to this point

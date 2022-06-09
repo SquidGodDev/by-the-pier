@@ -39,10 +39,28 @@ function FishingLine:drawLine()
     if self.lastX ~= self.hookX or self.lastY ~= self.hookY then
         self.lastX = self.hookX
         self.lastY = self.hookY
-        local lineImage = gfx.image.new(400 - self.rodX, 240 - self.topYOffset - self.bottomYOffset)
-        gfx.pushContext(lineImage)
-            gfx.drawLine(self.rodX - self.rodX, self.rodY - self.topYOffset, self.hookX - self.rodX, self.hookY - self.topYOffset)
-        gfx.popContext()
+        local lineHeight = math.abs(self.rodY - self.hookY)
+        local lineWidth = self.hookX - self.rodX
+        local lineImage
+        if lineHeight <= 1 or lineWidth <= 1 then
+            self:moveTo(self.rodX, self.topYOffset)
+            lineImage = gfx.image.new(400 - self.rodX, 240 - self.topYOffset - self.bottomYOffset)
+            gfx.pushContext(lineImage)
+                gfx.drawLine(self.rodX - self.rodX, self.rodY - self.topYOffset, self.hookX - self.rodX, self.hookY - self.topYOffset)
+            gfx.popContext()
+        elseif self.hookY > self.rodY then
+            self:moveTo(self.rodX, self.rodY)
+            lineImage = gfx.image.new(lineWidth, lineHeight)
+            gfx.pushContext(lineImage)
+                gfx.drawLine(0, 0, lineWidth, self.hookY - self.rodY)
+            gfx.popContext()
+        else
+            self:moveTo(self.rodX, self.hookY)
+            lineImage = gfx.image.new(lineWidth, lineHeight)
+            gfx.pushContext(lineImage)
+                gfx.drawLine(0, lineHeight, lineWidth, 0)
+            gfx.popContext()
+        end
         self:setImage(lineImage)
     end
 end
@@ -101,6 +119,9 @@ function FishingLine:update()
             -- Increase hookX to simulate fish pulling
             local crankInput = pd.getCrankTicks(18)
             if crankInput ~= 0 then
+                if not self.fishHooked then
+                    self.fishManager:resetTime()
+                end
                 if self.hookX > self.rodX + 3 then
                     self.hookX -= self.reelSpeed
                     if self.tensionBar then

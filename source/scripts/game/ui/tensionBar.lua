@@ -44,7 +44,6 @@ function TensionBar:drawTensionBar()
     local tensionLevelHeight = (self.tension / self.maxTension) * self.tensionBarHeight
     local tensionLevelY = self.tensionBarHeight - tensionLevelHeight
     local tensionBarImage = gfx.image.new(self.tensionBarWidth, self.tensionBarHeight)
-    print(self.tension)
     gfx.pushContext(tensionBarImage)
         gfx.drawRoundRect(0, 0, self.tensionBarWidth, self.tensionBarHeight, self.tensionBarCornerRadius)
         gfx.fillRoundRect(0, tensionLevelY, self.tensionBarWidth, tensionLevelHeight, self.tensionBarCornerRadius)

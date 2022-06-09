@@ -6,10 +6,16 @@ class('FishManager').extends()
 function FishManager:init(distance)
     self.distance = distance
     self.hooked = false
-    local hookTime = math.random(1000, 3000)
+    self.hookTimeMin = 1000
+    self.hookTimeMax = 3000
+    local hookTime = math.random(self.hookTimeMin, self.hookTimeMax)
     self.hookTimer = pd.timer.new(hookTime, function()
         self.hooked = true
     end)
+end
+
+function FishManager:resetTime()
+    self.hookTimer:reset()
 end
 
 -- Fish Variables:
