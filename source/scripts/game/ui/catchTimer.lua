@@ -39,7 +39,9 @@ end
 
 function CatchTimer:endTimer()
     self.timerRunning = false
-    self.exitAnimator = gfx.animator.new(self.transitionTime, self.timerY, self.timerOffScreenY, pd.easingFunctions.inOutCubic)
+    if not self.exitAnimator then
+        self.exitAnimator = gfx.animator.new(self.transitionTime, self.timerY, self.timerOffScreenY, pd.easingFunctions.inOutCubic)
+    end
 end
 
 function CatchTimer:update()
@@ -65,8 +67,6 @@ function CatchTimer:update()
         self.fishSprite:moveTo(newFishX, self.fishSprite.y)
         self.timeRemaining -= 1
         if self.timeRemaining <= 0 then
-            self.timerRunning = false
-            self.exitAnimator = gfx.animator.new(self.transitionTime, self.timerY, self.timerOffScreenY, pd.easingFunctions.inOutCubic)
             self.fishingLine:reeledIn()
         end
     end

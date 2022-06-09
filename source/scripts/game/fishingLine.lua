@@ -1,5 +1,6 @@
 import "scripts/game/fishManager"
 import "scripts/game/ui/catchTimer"
+import "scripts/game/ui/tensionBar"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -53,6 +54,12 @@ end
 
 function FishingLine:reeledIn()
     self.fishingRod:reeledIn()
+    if self.catchTimer then
+        self.catchTimer:endTimer()
+    end
+    if self.tensionBar then
+        self.tensionBar:stopTensionBar()
+    end
 end
 
 function FishingLine:update()
@@ -86,7 +93,8 @@ function FishingLine:update()
                 if self.fishManager:isHooked() then
                     self.fishHooked = true
                     self.fishingRod.water:impulse(self.hookX)
-                    self.catchTimer = CatchTimer(250, self)
+                    self.catchTimer = CatchTimer(350, self)
+                    self.tensionBar = TensionBar(0, 1, self)
                 end
             end
             -- Adjust crank ticks based on difficulty of fish?
@@ -95,8 +103,16 @@ function FishingLine:update()
             if crankInput ~= 0 then
                 if self.hookX > self.rodX + 3 then
                     self.hookX -= self.reelSpeed
+                    if self.tensionBar then
+                        self.tensionBar:increaseTension()
+                    end
                 else
-                    self.catchTimer:endTimer()
+                    if self.catchTimer then
+                        self.catchTimer:endTimer()
+                    end
+                    if self.tensionBar then
+                        self.tensionBar:stopTensionBar()
+                    end
                     self:reelUp()
                 end
             end
