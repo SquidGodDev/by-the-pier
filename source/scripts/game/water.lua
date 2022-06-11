@@ -2,10 +2,9 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 -- Resolution of simulation
--- local NUM_POINTS = 40
-local NUM_POINTS = 40
+local NUM_POINTS = 30
 -- Width of simulation
-local WIDTH = 450
+local WIDTH = 420
 -- Spring constant for forces applied by adjacent points
 local SPRING_CONSTANT = 0.005
 -- Sprint constant for force applied to baseline
