@@ -21,7 +21,7 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self.yVelocity = -math.sin(math.rad(angle)) * strength
     self.casting = true
 
-    self.reelSpeed = 3
+    self.reelSpeed = 1.5
     self.reelingUp = false
     self.reelUpSpeed = 3
 
@@ -33,6 +33,11 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self:setCenter(0, 0)
     self:moveTo(self.rodX, self.topYOffset)
     self:add()
+
+    local struggleIcon = gfx.image.new("images/game/struggleIcon")
+    self.struggleIndicator = gfx.sprite.new(struggleIcon)
+    self.struggleIndicator:setVisible(false)
+    self.struggleIndicator:add()
 end
 
 function FishingLine:drawLine()
@@ -71,7 +76,11 @@ function FishingLine:reelUp()
 end
 
 function FishingLine:reeledIn()
+    self.struggleIndicator:setVisible(false)
     self.fishingRod:reeledIn()
+    if self.fishManager then
+        self.fishManager:clear()
+    end
     if self.catchTimer then
         self.catchTimer:endTimer()
     end
@@ -82,62 +91,99 @@ end
 
 function FishingLine:update()
     if self.casting then
-        self.yVelocity += 9.8/30
-        self.hookX += self.xVelocity
-        self.hookY += self.yVelocity
-        if self.hookY >= self.waterLevel then
-            self.hookY = self.waterLevel
-            self.xVelocity = 0
-            self.yVelocity = 0
-            self.casting = false
-            self.fishingRod.water:impulse(self.hookX)
-            self.fishManager = FishManager(self.rodX - self.hookX)
-        end
+        self:handleCastPhysics()
     else
         if self.reelingUp then
-            self.hookY -= self.reelUpSpeed
-            if self.hookY <= self.rodY then
-                self.hookY = self.rodY
-                -- TODO: Pass in fish argument
-                self:reeledIn()
-            end
+            self:handleReelUpAnimation()
         else
             if self.fishHooked then
-                self.hookX += self.fishManager:getPullStrength()
-                if self.hookX >= 400 then
-                    self.hookX = 400
-                end
+                self:fishPullOnLine()
+                self:handleStruggleIndicator()
             else
                 if self.fishManager:isHooked() then
-                    self.fishHooked = true
-                    self.fishingRod.water:impulse(self.hookX)
-                    self.catchTimer = CatchTimer(350, self)
-                    self.tensionBar = TensionBar(0, 1, self)
+                    self:startFishing()
                 end
             end
-            -- Adjust crank ticks based on difficulty of fish?
-            -- Increase hookX to simulate fish pulling
-            local crankInput = pd.getCrankTicks(18)
-            if crankInput ~= 0 then
-                if not self.fishHooked then
-                    self.fishManager:resetTime()
-                end
-                if self.hookX > self.rodX + 3 then
-                    self.hookX -= self.reelSpeed
-                    if self.tensionBar then
-                        self.tensionBar:increaseTension()
-                    end
-                else
-                    if self.catchTimer then
-                        self.catchTimer:endTimer()
-                    end
-                    if self.tensionBar then
-                        self.tensionBar:stopTensionBar()
-                    end
-                    self:reelUp()
-                end
-            end
+            self:handleCrankInput()
         end
     end
     self:drawLine()
+end
+
+function FishingLine:handleCrankInput()
+    local crankInput = pd.getCrankTicks(18)
+    if crankInput ~= 0 then
+        if not self.fishHooked then
+            self.fishManager:resetTime()
+        end
+        if self:hookAtRod() then
+            self:stopCatchTimerAndTensionBar()
+            self:reelUp()
+        else
+            local struggling = self.fishManager:isStruggling()
+            self.hookX -= self.reelSpeed
+            if self.tensionBar then
+                self.tensionBar:increaseTension(struggling)
+            end
+        end
+    end
+end
+
+function FishingLine:stopCatchTimerAndTensionBar()
+    if self.catchTimer then
+        self.catchTimer:endTimer()
+    end
+    if self.tensionBar then
+        self.tensionBar:stopTensionBar()
+    end
+end
+
+function FishingLine:hookAtRod()
+    return self.hookX <= self.rodX + 3
+end
+
+function FishingLine:startFishing()
+    self.fishHooked = true
+    self.fishingRod.water:impulse(self.hookX)
+    self.catchTimer = CatchTimer(1200, self)
+    self.tensionBar = TensionBar(0, 1, self)
+end
+
+function FishingLine:fishPullOnLine()
+    self.hookX += self.fishManager:getPullStrength()
+    if self.hookX >= 400 then
+        self.hookX = 400
+    end
+end
+
+function FishingLine:handleReelUpAnimation()
+    self.hookY -= self.reelUpSpeed
+    if self.hookY <= self.rodY then
+        self.hookY = self.rodY
+        -- TODO: Pass in fish argument
+        self:reeledIn()
+    end
+end
+
+function FishingLine:handleCastPhysics()
+    self.yVelocity += 9.8/30
+    self.hookX += self.xVelocity
+    self.hookY += self.yVelocity
+    if self.hookY >= self.waterLevel then
+        self.hookY = self.waterLevel
+        self.xVelocity = 0
+        self.yVelocity = 0
+        self.casting = false
+        self.fishingRod.water:impulse(self.hookX)
+        self.fishManager = FishManager(self.rodX - self.hookX)
+    end
+end
+
+function FishingLine:handleStruggleIndicator()
+    if self.fishManager:isStruggling() then
+        self.struggleIndicator:moveTo(self.hookX, self.waterLevel - 30)
+        self.struggleIndicator:setVisible(true)
+    else
+        self.struggleIndicator:setVisible(false)
+    end
 end

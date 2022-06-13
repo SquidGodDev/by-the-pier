@@ -51,9 +51,13 @@ function TensionBar:drawTensionBar()
     self:setImage(tensionBarImage)
 end
 
-function TensionBar:increaseTension()
+function TensionBar:increaseTension(struggling)
     if self.tensionBarRunning then
-        self.tension += self.tensionRate
+        local struggleTension = 0
+        if struggling then
+            struggleTension = self.tensionRate * 0.25
+        end
+        self.tension += self.tensionRate + struggleTension
         self.tensionLossVelocity = 0
         if self.tension >= self.maxTension then
             self.fishingLine:reeledIn()
