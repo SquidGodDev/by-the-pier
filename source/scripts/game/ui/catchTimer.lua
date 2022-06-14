@@ -4,8 +4,8 @@ local gfx <const> = pd.graphics
 class('CatchTimer').extends(gfx.sprite)
 
 function CatchTimer:init(time, fishingLine)
-    self.time = time
-    self.timeRemaining = time
+    self.time = math.random(math.ceil(time * 0.8), math.ceil(time * 1.2))
+    self.timeRemaining = self.time
     self.fishingLine = fishingLine
     self.timerWidth = 200
     self.timerHeight = 15

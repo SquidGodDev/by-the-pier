@@ -97,8 +97,8 @@ function FishingRod:throwLine()
         end
         averageSpeed = differenceSum / (lastPositiveIndex - firstPositiveIndex + 1)
     end
-    if averageSpeed < 0 then
-        averageSpeed = 0
+    if averageSpeed <= 0 then
+        averageSpeed = .2
     elseif averageSpeed > 1 then
         averageSpeed = 1
     end

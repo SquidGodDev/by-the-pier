@@ -1,10 +1,25 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
+local fishTable = json.decodeFile("fish.json")
+
 class('FishManager').extends()
 
 function FishManager:init(distance)
     self.distance = distance
+
+    local fishOptions
+    if distance < 104 then
+        fishOptions = fishTable["close"]
+    elseif distance < 194 then
+        fishOptions = fishTable["mid"]
+    else
+        fishOptions = fishTable["far"]
+    end
+
+    local fishIndex = math.random(1, #fishOptions)
+    self.hookedFish = fishOptions[fishIndex]
+
     self.hooked = false
     self.hookTimeMin = 1000
     self.hookTimeMax = 3000
@@ -14,11 +29,16 @@ function FishManager:init(distance)
         self.struggleTimer = self:getStruggleTimer()
     end)
 
+    local pullStrength = self.hookedFish["pullStrength"]
+    self.pullStrength = math.random(math.ceil(pullStrength * 0.8 * 100), math.ceil(pullStrength * 1.2 * 100)) / 100
+
     self.struggling = false
-    self.struggleTimeMin = 500
-    self.struggleTimeMax = 2000
-    self.struggleWaitTimeMin = 3000
-    self.struggleWaitTimeMax = 5000
+    local struggleTimeMedian = self.hookedFish["struggleTime"]
+    self.struggleTimeMin = struggleTimeMedian * 0.7
+    self.struggleTimeMax = struggleTimeMedian * 1.3
+    local struggleWaitTimeMedian = self.hookedFish["struggleWaitTime"]
+    self.struggleWaitTimeMin = struggleWaitTimeMedian * 0.7
+    self.struggleWaitTimeMax = struggleWaitTimeMedian * 1.3
 end
 
 function FishManager:getStruggleTimer()
@@ -27,7 +47,6 @@ function FishManager:getStruggleTimer()
         struggleTime = math.random(self.struggleWaitTimeMin, self.struggleWaitTimeMax)
     end
     return pd.timer.new(struggleTime, function()
-        print(self.struggling)
         self.struggleTimer = self:getStruggleTimer()
         self.struggling = not self.struggling
     end)
@@ -47,14 +66,14 @@ end
 -- 7. Distance to be caught at
 -- 8. Struggle time
 function FishManager:getFishInfo()
-    
+    return self.hookedFish
 end
 
 function FishManager:getPullStrength()
     if self.struggling then
-        return 1
+        return self.pullStrength * 2
     else
-        return 0.5
+        return self.pullStrength
     end
 end
 

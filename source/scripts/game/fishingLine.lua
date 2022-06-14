@@ -77,7 +77,7 @@ end
 
 function FishingLine:reeledIn()
     self.struggleIndicator:setVisible(false)
-    self.fishingRod:reeledIn()
+    self.fishingRod:reeledIn(self.fishManager:getFishInfo())
     if self.fishManager then
         self.fishManager:clear()
     end
@@ -145,8 +145,12 @@ end
 function FishingLine:startFishing()
     self.fishHooked = true
     self.fishingRod.water:impulse(self.hookX)
-    self.catchTimer = CatchTimer(1200, self)
-    self.tensionBar = TensionBar(0, 1, self)
+    local hookedFish = self.fishManager:getFishInfo()
+    local catchTime = hookedFish["catchTime"]
+    self.catchTimer = CatchTimer(catchTime, self)
+    local initialTension = hookedFish["initialTension"]
+    local tensionRate = hookedFish["pullStrength"] * 2
+    self.tensionBar = TensionBar(initialTension, tensionRate, self)
 end
 
 function FishingLine:fishPullOnLine()
@@ -160,7 +164,6 @@ function FishingLine:handleReelUpAnimation()
     self.hookY -= self.reelUpSpeed
     if self.hookY <= self.rodY then
         self.hookY = self.rodY
-        -- TODO: Pass in fish argument
         self:reeledIn()
     end
 end
@@ -175,7 +178,7 @@ function FishingLine:handleCastPhysics()
         self.yVelocity = 0
         self.casting = false
         self.fishingRod.water:impulse(self.hookX)
-        self.fishManager = FishManager(self.rodX - self.hookX)
+        self.fishManager = FishManager(self.hookX - self.rodX)
     end
 end
 

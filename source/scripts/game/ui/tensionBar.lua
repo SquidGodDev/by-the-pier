@@ -4,8 +4,13 @@ local gfx <const> = pd.graphics
 class('TensionBar').extends(gfx.sprite)
 
 function TensionBar:init(tension, tensionRate, fishingLine)
-    self.tension = tension
-    self.tensionRate = tensionRate
+    self.tension = math.random(math.ceil(tension * 0.8), math.ceil(tension * 1.2))
+    if self.tension >= 99 then
+        self.tension = 99
+    elseif self.tension <= 0 then
+        self.tension = 0
+    end
+    self.tensionRate = math.random(math.ceil(tensionRate * 0.8 * 100), math.ceil(tensionRate * 1.2 * 100)) / 100
     self.fishingLine = fishingLine
     self.tensionLossVelocity = 0
     self.tensionLossAcceleration = 0.05

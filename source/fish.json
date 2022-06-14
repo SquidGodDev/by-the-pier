@@ -1,0 +1,92 @@
+{
+    "close" : [
+        {
+            "name": "Goldfish",
+            "flavorText" : "Might've been someone's pet",
+            "imagePath" : "goldfish",
+            "initialTension" : 90,
+            "pullStrength" : 0.4,
+            "catchTime" : 250,
+            "struggleWaitTime" : 5000,
+            "struggleTime" : 500,
+            "lengthMean" : 20,
+            "lengthVariance" : 10
+        },
+        {
+            "name": "Sock",
+            "flavorText" : "Still smells like gym class",
+            "imagePath" : "sock",
+            "initialTension" : 90,
+            "pullStrength" : 0.4,
+            "catchTime" : 250,
+            "struggleWaitTime" : 5000,
+            "struggleTime" : 500,
+            "lengthMean" : 30,
+            "lengthVariance" : 10
+        },
+        {
+            "name": "Carp",
+            "flavorText" : "It's oily, but you wouldn't say it to it's face",
+            "imagePath" : "carp",
+            "initialTension" : 90,
+            "pullStrength" : 0.5,
+            "catchTime" : 250,
+            "struggleWaitTime" : 4000,
+            "struggleTime" : 1000,
+            "lengthMean" : 63,
+            "lengthVariance" : 20
+        }
+    ],
+    "mid" : [
+        {
+            "name": "Butterfly Fish",
+            "flavorText" : "Doesn't appear to have any wings",
+            "imagePath" : "butterfly",
+            "initialTension" : 0,
+            "pullStrength" : 0.5,
+            "catchTime" : 1200,
+            "struggleWaitTime" : 4000,
+            "struggleTime" : 1000,
+            "lengthMean" : 20,
+            "lengthVariance" : 5
+        },
+        {
+            "name": "catfish",
+            "flavorText" : "Not what you expected",
+            "imagePath" : "catfish",
+            "initialTension" : 0,
+            "pullStrength" : 0.5,
+            "catchTime" : 1200,
+            "struggleWaitTime" : 4000,
+            "struggleTime" : 1000,
+            "lengthMean" : 55,
+            "lengthVariance" : 30
+        }
+    ],
+    "far" : [
+        {
+            "name": "Eel",
+            "flavorText" : "You can f-eel it wiggling around",
+            "imagePath" : "eel",
+            "initialTension" : 0,
+            "pullStrength" : 0.5,
+            "catchTime" : 1200,
+            "struggleWaitTime" : 4000,
+            "struggleTime" : 1000,
+            "lengthMean" : 120,
+            "lengthVariance" : 60
+        },
+        {
+            "name": "Sea Shell",
+            "flavorText" : "Sold by the seashore",
+            "imagePath" : "shell",
+            "initialTension" : 0,
+            "pullStrength" : 0.5,
+            "catchTime" : 1200,
+            "struggleWaitTime" : 4000,
+            "struggleTime" : 1000,
+            "lengthMean" : 20,
+            "lengthVariance" : 10
+        }
+    ]
+}
