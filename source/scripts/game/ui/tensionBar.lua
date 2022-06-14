@@ -65,7 +65,7 @@ function TensionBar:increaseTension(struggling)
         self.tension += self.tensionRate + struggleTension
         self.tensionLossVelocity = 0
         if self.tension >= self.maxTension then
-            self.fishingLine:reeledIn()
+            self.fishingLine:reeledIn(false)
         end
     end
 end

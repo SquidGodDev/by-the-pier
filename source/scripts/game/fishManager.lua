@@ -5,20 +5,8 @@ local fishTable = json.decodeFile("fish.json")
 
 class('FishManager').extends()
 
-function FishManager:init(distance)
-    self.distance = distance
-
-    local fishOptions
-    if distance < 104 then
-        fishOptions = fishTable["close"]
-    elseif distance < 194 then
-        fishOptions = fishTable["mid"]
-    else
-        fishOptions = fishTable["far"]
-    end
-
-    local fishIndex = math.random(1, #fishOptions)
-    self.hookedFish = fishOptions[fishIndex]
+function FishManager:init(fishingLine)
+    self.fishingLine = fishingLine
 
     self.hooked = false
     self.hookTimeMin = 1000
@@ -26,19 +14,9 @@ function FishManager:init(distance)
     local hookTime = math.random(self.hookTimeMin, self.hookTimeMax)
     self.hookTimer = pd.timer.new(hookTime, function()
         self.hooked = true
+        self:initializeFishData()
         self.struggleTimer = self:getStruggleTimer()
     end)
-
-    local pullStrength = self.hookedFish["pullStrength"]
-    self.pullStrength = math.random(math.ceil(pullStrength * 0.8 * 100), math.ceil(pullStrength * 1.2 * 100)) / 100
-
-    self.struggling = false
-    local struggleTimeMedian = self.hookedFish["struggleTime"]
-    self.struggleTimeMin = struggleTimeMedian * 0.7
-    self.struggleTimeMax = struggleTimeMedian * 1.3
-    local struggleWaitTimeMedian = self.hookedFish["struggleWaitTime"]
-    self.struggleWaitTimeMin = struggleWaitTimeMedian * 0.7
-    self.struggleWaitTimeMax = struggleWaitTimeMedian * 1.3
 end
 
 function FishManager:getStruggleTimer()
@@ -54,6 +32,32 @@ end
 
 function FishManager:resetTime()
     self.hookTimer:reset()
+end
+
+function FishManager:initializeFishData()
+    local distance = self.fishingLine.hookX - self.fishingLine.rodX
+    local fishOptions
+    if distance < 104 then
+        fishOptions = fishTable["close"]
+    elseif distance < 194 then
+        fishOptions = fishTable["mid"]
+    else
+        fishOptions = fishTable["far"]
+    end
+
+    local fishIndex = math.random(1, #fishOptions)
+    self.hookedFish = fishOptions[fishIndex]
+
+    local pullStrength = self.hookedFish["pullStrength"]
+    self.pullStrength = math.random(math.ceil(pullStrength * 0.8 * 100), math.ceil(pullStrength * 1.2 * 100)) / 100
+
+    self.struggling = false
+    local struggleTimeMedian = self.hookedFish["struggleTime"]
+    self.struggleTimeMin = struggleTimeMedian * 0.7
+    self.struggleTimeMax = struggleTimeMedian * 1.3
+    local struggleWaitTimeMedian = self.hookedFish["struggleWaitTime"]
+    self.struggleWaitTimeMin = struggleWaitTimeMedian * 0.7
+    self.struggleWaitTimeMax = struggleWaitTimeMedian * 1.3
 end
 
 -- Fish Variables:

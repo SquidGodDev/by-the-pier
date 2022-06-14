@@ -75,9 +75,13 @@ function FishingLine:reelUp()
     self.reelingUp = true
 end
 
-function FishingLine:reeledIn()
+function FishingLine:reeledIn(caught)
     self.struggleIndicator:setVisible(false)
-    self.fishingRod:reeledIn(self.fishManager:getFishInfo())
+    if caught and self.fishManager:isHooked() then
+        self.fishingRod:reeledIn(self.fishManager:getFishInfo())
+    else
+        self.fishingRod:reeledIn()
+    end
     if self.fishManager then
         self.fishManager:clear()
     end
@@ -164,7 +168,7 @@ function FishingLine:handleReelUpAnimation()
     self.hookY -= self.reelUpSpeed
     if self.hookY <= self.rodY then
         self.hookY = self.rodY
-        self:reeledIn()
+        self:reeledIn(true)
     end
 end
 
@@ -178,7 +182,7 @@ function FishingLine:handleCastPhysics()
         self.yVelocity = 0
         self.casting = false
         self.fishingRod.water:impulse(self.hookX)
-        self.fishManager = FishManager(self.hookX - self.rodX)
+        self.fishManager = FishManager(self)
     end
 end
 

@@ -1,4 +1,5 @@
 import "scripts/game/fishingLine"
+import "scripts/game/ui/resultDisplay"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -6,6 +7,7 @@ local gfx <const> = pd.graphics
 class('FishingRod').extends(gfx.sprite)
 
 function FishingRod:init(water)
+    pd.startAccelerometer()
     self.water = water
     self.handX = 67
     self.handY = 154
@@ -108,6 +110,9 @@ function FishingRod:throwLine()
 end
 
 function FishingRod:reeledIn(fish)
+    if fish then
+        self.resultDisplay = ResultDisplay(fish, self)
+    end
     if self.fishingLine then
         self.fishingLine:remove()
         self.fishingLine = nil
@@ -115,10 +120,16 @@ function FishingRod:reeledIn(fish)
     end
 end
 
+function FishingRod:remove()
+    pd.stopAccelerometer()
+    self:remove()
+end
+
 function FishingRod:update()
-    if pd.buttonJustPressed(pd.kButtonA) then
+    if self.resultDisplay then
+        -- Do Nothing
+    elseif pd.buttonJustPressed(pd.kButtonA) then
         self.accelerometerValues = {}
-        pd.startAccelerometer()
         local x, y, z = pd.readAccelerometer()
         self.currentZ = z
         self:castBack()
@@ -128,7 +139,6 @@ function FishingRod:update()
         self.currentZ = z
     elseif pd.buttonJustReleased(pd.kButtonA) then
         self:cast()
-        pd.stopAccelerometer()
     end
 
     if self.rodAnimator then
@@ -142,4 +152,8 @@ function FishingRod:update()
         end
     end
     self:drawRod()
+end
+
+function FishingRod:resultDisplayDismissed()
+    self.resultDisplay = nil
 end

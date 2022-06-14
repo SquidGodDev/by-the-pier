@@ -67,7 +67,7 @@ function CatchTimer:update()
         self.fishSprite:moveTo(newFishX, self.fishSprite.y)
         self.timeRemaining -= 1
         if self.timeRemaining <= 0 then
-            self.fishingLine:reeledIn()
+            self.fishingLine:reeledIn(false)
         end
     end
 end
