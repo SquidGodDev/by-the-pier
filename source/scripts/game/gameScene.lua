@@ -7,6 +7,7 @@ local gfx <const> = pd.graphics
 class('GameScene').extends(gfx.sprite)
 
 function GameScene:init()
+    SHOW_CRANK_INDICATOR = false
     self.water = Water()
     self.fishingRod = FishingRod(self.water)
     local backgroundImage = gfx.image.new("images/game/background")

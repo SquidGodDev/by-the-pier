@@ -5,6 +5,7 @@ local gfx <const> = pd.graphics
 class('TitleScene').extends(gfx.sprite)
 
 function TitleScene:init()
+    SHOW_CRANK_INDICATOR = false
     local titleImage = gfx.image.new("images/title/title")
     self:setImage(titleImage)
     self:setZIndex(-200)
@@ -57,7 +58,7 @@ function TitleScene:init()
     howToPlaySprite = gfx.sprite.new(howToPlayImage)
     howToPlaySprite:setCenter(0, 0)
     howToPlaySprite:moveTo(350, -70)
-    local howToPlaySpriteY = 10
+    local howToPlaySpriteY = 37
     self.howToPlaySpriteAnimator = gfx.animator.new(promptAnimationTime, howToPlaySprite.y, howToPlaySpriteY, pd.easingFunctions.inOutCubic, promptTimeOffset)
     howToPlaySprite:add()
     self.howToPlaySprite = howToPlaySprite
