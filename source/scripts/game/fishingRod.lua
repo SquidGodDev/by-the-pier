@@ -7,7 +7,6 @@ local gfx <const> = pd.graphics
 class('FishingRod').extends(gfx.sprite)
 
 function FishingRod:init(water)
-    pd.startAccelerometer()
     self.water = water
     self.handX = 67
     self.handY = 154
@@ -120,25 +119,24 @@ function FishingRod:reeledIn(fish)
     end
 end
 
-function FishingRod:remove()
-    pd.stopAccelerometer()
-    self:remove()
-end
-
 function FishingRod:update()
     if self.resultDisplay then
         -- Do Nothing
     elseif pd.buttonJustPressed(pd.kButtonA) then
+        pd.startAccelerometer()
         self.accelerometerValues = {}
         local x, y, z = pd.readAccelerometer()
         self.currentZ = z
         self:castBack()
     elseif pd.buttonIsPressed(pd.kButtonA) then
-        local x, y, z = pd.readAccelerometer()
-        table.insert(self.accelerometerValues, 1, z - self.currentZ)
-        self.currentZ = z
+        if pd.accelerometerIsRunning() then
+            local x, y, z = pd.readAccelerometer()
+            table.insert(self.accelerometerValues, 1, z - self.currentZ)
+            self.currentZ = z
+        end
     elseif pd.buttonJustReleased(pd.kButtonA) then
         self:cast()
+        pd.stopAccelerometer()
     end
 
     if self.rodAnimator then
