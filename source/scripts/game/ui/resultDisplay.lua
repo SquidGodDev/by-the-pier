@@ -61,13 +61,29 @@ function ResultDisplay:calculateSize(fish)
     if size <= 1 then
         size = 1
     end
+
+    local newLength = false
+
+    local oldLength = CAUGHT_FISH[fish["name"]]
+    if not oldLength or size > oldLength then
+        newLength = true
+        CAUGHT_FISH[fish["name"]] = size
+    end
+
+    local returnString
     if size >= 100 then
         size = math.ceil(size) / 100
-        return tostring(size) .. " M"
+        returnString = tostring(size) .. " M"
     else
         size = math.ceil(size * 100) / 100
-        return tostring(size) .. " CM"
+        returnString = tostring(size) .. " CM"
     end
+
+    if newLength then
+        returnString = "NEW - " .. returnString
+    end
+
+    return returnString
 end
 
 function ResultDisplay:gaussian(mean, variance)

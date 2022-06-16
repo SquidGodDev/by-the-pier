@@ -51,7 +51,7 @@
             "lengthVariance" : 5
         },
         {
-            "name": "catfish",
+            "name": "Catfish",
             "flavorText" : "Not what you expected",
             "imagePath" : "catfish",
             "initialTension" : 0,

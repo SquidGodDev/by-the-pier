@@ -4,16 +4,20 @@ import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/crank"
 import "CoreLibs/ui"
+import "CoreLibs/nineslice"
 
 import "scripts/sceneManager"
 import "scripts/game/gameScene"
 import "scripts/title/titleScene"
 import "scripts/instructions/instructionsScene"
+import "scripts/directory/directoryScene"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 math.randomseed(pd.getSecondsSinceEpoch())
+
+CAUGHT_FISH = {}
 
 SceneManager = SceneManager()
 TitleScene()
@@ -24,6 +28,10 @@ pd.ui.crankIndicator:start()
 local menu = pd.getSystemMenu()
 menu:addMenuItem("How to Play", function()
     SceneManager:switchScene(InstructionsScene)
+end)
+
+menu:addMenuItem("Fishing Log", function()
+    SceneManager:switchScene(DirectoryScene)
 end)
 
 function pd.update()
