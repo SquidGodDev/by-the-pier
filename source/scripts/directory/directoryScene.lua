@@ -67,6 +67,12 @@ function DirectoryScene:init()
         gfx.drawTextInRect(fishName, x, y + height/4, width, height, nil, "...", kTextAlignment.center)
     end
 
+    local listImage = gfx.image.new(400, 240)
+    gfx.pushContext(listImage)
+        self.listview:drawInRect(20, 20, 150, 210)
+    gfx.popContext()
+    self:setImage(listImage)
+
     self:setCenter(0, 0)
     self:moveTo(0, 0)
     self:add()
@@ -77,16 +83,20 @@ function DirectoryScene:update()
         SceneManager:switchScene(TitleScene)
     end
 
-    local listImage = gfx.image.new(400, 240)
-    gfx.pushContext(listImage)
-        self.listview:drawInRect(20, 20, 150, 210)
-    gfx.popContext()
-    self:setImage(listImage)
-
     if pd.buttonJustPressed(pd.kButtonUp) then
-        self.listview:selectPreviousRow(true)
+        self.listview:selectPreviousRow(false)
+        local listImage = gfx.image.new(400, 240)
+        gfx.pushContext(listImage)
+            self.listview:drawInRect(20, 20, 150, 210)
+        gfx.popContext()
+        self:setImage(listImage)
     elseif pd.buttonJustPressed(pd.kButtonDown) then
-        self.listview:selectNextRow(true)
+        self.listview:selectNextRow(false)
+        local listImage = gfx.image.new(400, 240)
+        gfx.pushContext(listImage)
+            self.listview:drawInRect(20, 20, 150, 210)
+        gfx.popContext()
+        self:setImage(listImage)
     end
 end
 
