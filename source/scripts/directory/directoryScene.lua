@@ -11,8 +11,6 @@ function DirectoryScene:init()
     self.listview = pd.ui.gridview.new(0, 40)
     self.listview.backgroundImage = gfx.nineSlice.new('images/directory/directoryBackground', 4, 4, 26, 26)
     self.listview:setNumberOfRows(fishCount)
-    -- self.listview:setCellPadding(0, 0, 13, 10)
-    -- self.listview:setContentInset(24, 24, 13, 11)
 
     local notebookSprite = gfx.sprite.new()
     notebookSprite:setCenter(0, 0)

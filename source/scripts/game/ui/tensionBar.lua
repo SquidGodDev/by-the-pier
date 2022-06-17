@@ -41,7 +41,9 @@ function TensionBar:init(tension, tensionRate, fishingLine)
     self:moveTo(self.offScreenX, self.tensionBarY)
     self.lineBreakIcon:moveTo(self.offScreenX, self.tensionBarY - self.tensionBarHeight / 2 - 15)
 
+    self:setZIndex(100)
     self:add()
+    self.lineBreakIcon:setZIndex(100)
     self.lineBreakIcon:add()
 end
 
