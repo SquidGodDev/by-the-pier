@@ -42,7 +42,7 @@ function pd.update()
     SceneManager:update()
     gfx.sprite.update()
     pd.timer.updateTimers()
-    pd.drawFPS(10, 10)
+    -- pd.drawFPS(10, 10)
 
     if pd.isCrankDocked() and SHOW_CRANK_INDICATOR then
         pd.ui.crankIndicator:update()
