@@ -35,6 +35,8 @@ function CatchTimer:init(time, fishingLine)
 
     self:add()
     self.fishSprite:add()
+
+    self.lineSnapSound = pd.sound.sampleplayer.new("sound/LineSnap")
 end
 
 function CatchTimer:endTimer()
@@ -67,6 +69,7 @@ function CatchTimer:update()
         self.fishSprite:moveTo(newFishX, self.fishSprite.y)
         self.timeRemaining -= 1
         if self.timeRemaining <= 0 then
+            self.lineSnapSound:play()
             self.fishingLine:reeledIn(false)
         end
     end

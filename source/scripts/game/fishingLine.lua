@@ -38,6 +38,8 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self.struggleIndicator = gfx.sprite.new(struggleIcon)
     self.struggleIndicator:setVisible(false)
     self.struggleIndicator:add()
+
+    self.splashSound = pd.sound.sampleplayer.new("sound/Splash")
 end
 
 function FishingLine:drawLine()
@@ -177,6 +179,7 @@ function FishingLine:handleCastPhysics()
     self.hookX += self.xVelocity
     self.hookY += self.yVelocity
     if self.hookY >= self.waterLevel then
+        self.splashSound:play()
         self.hookY = self.waterLevel
         self.xVelocity = 0
         self.yVelocity = 0

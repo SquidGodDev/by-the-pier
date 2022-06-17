@@ -45,6 +45,8 @@ function TensionBar:init(tension, tensionRate, fishingLine)
     self:add()
     self.lineBreakIcon:setZIndex(100)
     self.lineBreakIcon:add()
+
+    self.lineSnapSound = pd.sound.sampleplayer.new("sound/LineSnap")
 end
 
 function TensionBar:drawTensionBar()
@@ -67,6 +69,7 @@ function TensionBar:increaseTension(struggling)
         self.tension += self.tensionRate + struggleTension
         self.tensionLossVelocity = 0
         if self.tension >= self.maxTension then
+            self.lineSnapSound:play()
             self.fishingLine:reeledIn(false)
         end
     end

@@ -25,6 +25,8 @@ function FishingRod:init(water)
     self.lastRodEndX = -1
     self.lastRodEndY = -1
 
+    self.castSound = pd.sound.sampleplayer.new("sound/Reel")
+
     self:moveTo(self.handX, self.handY)
     self:add()
 end
@@ -145,6 +147,7 @@ function FishingRod:update()
         self.rodEndY = rodEndPoint.y
         if self.rodAnimator:ended() then
             if not self.castingBack then
+                self.castSound:play()
                 self:throwLine()
             end
         end

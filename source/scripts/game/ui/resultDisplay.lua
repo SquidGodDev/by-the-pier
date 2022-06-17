@@ -6,6 +6,9 @@ class('ResultDisplay').extends(gfx.sprite)
 function ResultDisplay:init(fish, fishingRod)
     self.fishingRod = fishingRod
 
+    local fishCatchSound = pd.sound.sampleplayer.new("sound/FishCatch")
+    fishCatchSound:play()
+
     local notebookImage = gfx.image.new("images/game/notebook")
     gfx.pushContext(notebookImage)
         local imageX = 92

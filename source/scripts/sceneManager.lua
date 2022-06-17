@@ -10,8 +10,7 @@ function SceneManager:init()
     self.transitionTime = 1200
     self.transitioningIn = false
 
-    -- self.transitionInSound = pd.sound.sampleplayer.new("sounds/transitionIn")
-    -- self.transitionOutSound = pd.sound.sampleplayer.new("sounds/transitionOut")
+    self.transitionSound = pd.sound.sampleplayer.new("sound/RiverTransition")
 end
 
 function SceneManager:switchScene(scene)
@@ -20,7 +19,8 @@ function SceneManager:switchScene(scene)
     end
     self.transitionAnimator = gfx.animator.new(self.transitionTime, self.waveWidth, 0, pd.easingFunctions.outCubic)
     self.transitioningIn = true
-    -- self.transitionInSound:play()
+
+    self.transitionSound:play()
     self.newScene = scene
     self:createTransitionSprite(false)
 end
@@ -35,12 +35,6 @@ end
 
 function SceneManager:update()
     if self.transitionAnimator then
-        -- local transitionImage = gfx.image.new(400, 240)
-        -- gfx.pushContext(transitionImage)
-        --     local width = self.transitionAnimator:currentValue()
-        --     gfx.fillRect(0, 0, width, 240)
-        -- gfx.popContext()
-        -- self.transitionSprite:setImage(transitionImage)
         local transitionValue = self.transitionAnimator:currentValue()
         self.transitionSprite:moveTo(-transitionValue, -transitionValue / 2)
         if self.transitioningIn and self.transitionAnimator:ended() then
