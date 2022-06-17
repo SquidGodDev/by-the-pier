@@ -132,7 +132,9 @@ function FishingLine:handleCrankInput()
             self.fishManager:resetTime()
         end
         if self:hookAtRod() then
-            self.fishCatchSound:play()
+            if self.fishHooked then
+                self.fishCatchSound:play()
+            end
             self:stopCatchTimerAndTensionBar()
             self:reelUp()
         else

@@ -87,6 +87,18 @@
             "struggleTime" : 1000,
             "lengthMean" : 20,
             "lengthVariance" : 10
+        },
+        {
+            "name": "Squid",
+            "flavorText" : "Friend of SquidGodDev",
+            "imagePath" : "squid",
+            "initialTension" : 0,
+            "pullStrength" : 0.5,
+            "catchTime" : 1200,
+            "struggleWaitTime" : 4000,
+            "struggleTime" : 1000,
+            "lengthMean" : 70,
+            "lengthVariance" : 20
         }
     ]
 }
