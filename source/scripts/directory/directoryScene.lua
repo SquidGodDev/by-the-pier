@@ -65,14 +65,14 @@ function DirectoryScene:init()
         gfx.drawTextInRect(fishName, x, y + height/4, width, height, nil, "...", kTextAlignment.center)
     end
 
-    local listImage = gfx.image.new(400, 240)
+    local listImage = gfx.image.new(150, 210)
     gfx.pushContext(listImage)
-        self.listview:drawInRect(20, 20, 150, 210)
+        self.listview:drawInRect(0, 0, 150, 210)
     gfx.popContext()
     self:setImage(listImage)
 
     self:setCenter(0, 0)
-    self:moveTo(0, 0)
+    self:moveTo(20, 20)
     self:add()
 
     self.UISound = pd.sound.sampleplayer.new("sound/Drop")
@@ -86,17 +86,15 @@ function DirectoryScene:update()
     if pd.buttonJustPressed(pd.kButtonUp) then
         self.UISound:play()
         self.listview:selectPreviousRow(false)
-        local listImage = gfx.image.new(400, 240)
-        gfx.pushContext(listImage)
-            self.listview:drawInRect(20, 20, 150, 210)
-        gfx.popContext()
-        self:setImage(listImage)
     elseif pd.buttonJustPressed(pd.kButtonDown) then
         self.UISound:play()
         self.listview:selectNextRow(false)
-        local listImage = gfx.image.new(400, 240)
+    end
+
+    if self.listview.needsDisplay then
+        local listImage = gfx.image.new(150, 210)
         gfx.pushContext(listImage)
-            self.listview:drawInRect(20, 20, 150, 210)
+            self.listview:drawInRect(0, 0, 150, 210)
         gfx.popContext()
         self:setImage(listImage)
     end
