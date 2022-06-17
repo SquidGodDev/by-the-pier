@@ -8,6 +8,8 @@ local gfx <const> = pd.graphics
 class('GameScene').extends(gfx.sprite)
 
 function GameScene:init()
+    local oceanWavesSound = pd.sound.sampleplayer.new("sound/OceanWaves")
+    SceneManager:playRepeatingSound(oceanWavesSound)
     SHOW_CRANK_INDICATOR = false
     self.water = Water()
     self.fishingRod = FishingRod(self.water)

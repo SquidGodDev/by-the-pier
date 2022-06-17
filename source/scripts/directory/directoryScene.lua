@@ -74,14 +74,17 @@ function DirectoryScene:init()
     self:setCenter(0, 0)
     self:moveTo(0, 0)
     self:add()
+
+    self.UISound = pd.sound.sampleplayer.new("sound/Drop")
 end
 
 function DirectoryScene:update()
     if pd.buttonJustPressed(pd.kButtonB) then
-        SceneManager:switchScene(TitleScene)
+        SceneManager:switchScene(GameScene)
     end
 
     if pd.buttonJustPressed(pd.kButtonUp) then
+        self.UISound:play()
         self.listview:selectPreviousRow(false)
         local listImage = gfx.image.new(400, 240)
         gfx.pushContext(listImage)
@@ -89,6 +92,7 @@ function DirectoryScene:update()
         gfx.popContext()
         self:setImage(listImage)
     elseif pd.buttonJustPressed(pd.kButtonDown) then
+        self.UISound:play()
         self.listview:selectNextRow(false)
         local listImage = gfx.image.new(400, 240)
         gfx.pushContext(listImage)

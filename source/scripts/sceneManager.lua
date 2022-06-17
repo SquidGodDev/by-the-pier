@@ -26,6 +26,9 @@ function SceneManager:switchScene(scene)
 end
 
 function SceneManager:loadNewScene()
+    if self.repeatingSound then
+        self.repeatingSound:stop()
+    end
     gfx.sprite.removeAll()
     self:createTransitionSprite(true)
     self.transitionAnimator = gfx.animator.new(self.transitionTime, 0, self.waveWidth, pd.easingFunctions.inCubic)
@@ -39,7 +42,6 @@ function SceneManager:update()
         self.transitionSprite:moveTo(-transitionValue, -transitionValue / 2)
         if self.transitioningIn and self.transitionAnimator:ended() then
             self:loadNewScene()
-            -- self.transitionOutSound:play()
         elseif self.transitionAnimator:ended() then
             self.transitionAnimator = nil
         end
@@ -59,4 +61,9 @@ function SceneManager:createTransitionSprite(filled)
     self.transitionSprite:setIgnoresDrawOffset(true)
     self.transitionSprite:setZIndex(1000)
     self.transitionSprite:add()
+end
+
+function SceneManager:playRepeatingSound(soundSample)
+    self.repeatingSound = soundSample
+    self.repeatingSound:play(0)
 end

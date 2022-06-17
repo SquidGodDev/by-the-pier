@@ -40,6 +40,9 @@ function FishingLine:init(fishingRod, rodX, rodY, strength, angle)
     self.struggleIndicator:add()
 
     self.splashSound = pd.sound.sampleplayer.new("sound/Splash")
+    self.fishCatchSound = pd.sound.sampleplayer.new("sound/FishCatch")
+    self.reelInSound = pd.sound.sampleplayer.new("sound/ReelIn")
+    self.reelOutSound = pd.sound.sampleplayer.new("sound/ReelOut")
 end
 
 function FishingLine:drawLine()
@@ -78,6 +81,8 @@ function FishingLine:reelUp()
 end
 
 function FishingLine:reeledIn(caught)
+    self.reelInSound:stop()
+    self.reelOutSound:stop()
     self.struggleIndicator:setVisible(false)
     if caught and self.fishManager:isHooked() then
         self.fishingRod:reeledIn(self.fishManager:getFishInfo())
@@ -119,10 +124,15 @@ end
 function FishingLine:handleCrankInput()
     local crankInput = pd.getCrankTicks(18)
     if crankInput ~= 0 then
+        self.reelOutSound:stop()
+        if not self.reelInSound:isPlaying() then
+            self.reelInSound:play(0)
+        end
         if not self.fishHooked then
             self.fishManager:resetTime()
         end
         if self:hookAtRod() then
+            self.fishCatchSound:play()
             self:stopCatchTimerAndTensionBar()
             self:reelUp()
         else
@@ -131,6 +141,15 @@ function FishingLine:handleCrankInput()
             if self.tensionBar then
                 self.tensionBar:increaseTension(struggling)
             end
+        end
+    else
+        self.reelInSound:stop()
+        if self.fishHooked then
+            if not self.reelOutSound:isPlaying() then
+                self.reelOutSound:play(0)
+            end
+        else
+            self.reelOutSound:stop()
         end
     end
 end
@@ -151,6 +170,7 @@ end
 function FishingLine:startFishing()
     self.fishHooked = true
     self.fishingRod.water:impulse(self.hookX)
+    self.splashSound:play()
     local hookedFish = self.fishManager:getFishInfo()
     local catchTime = hookedFish["catchTime"]
     self.catchTimer = CatchTimer(catchTime, self)

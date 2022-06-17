@@ -5,6 +5,9 @@ local gfx <const> = pd.graphics
 class('TitleScene').extends(gfx.sprite)
 
 function TitleScene:init()
+    local oceanWavesSound = pd.sound.sampleplayer.new("sound/OceanWaves")
+    SceneManager:playRepeatingSound(oceanWavesSound)
+
     SHOW_CRANK_INDICATOR = false
     local titleImage = gfx.image.new("images/title/title")
     self:setImage(titleImage)

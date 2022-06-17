@@ -6,8 +6,9 @@ class('ResultDisplay').extends(gfx.sprite)
 function ResultDisplay:init(fish, fishingRod)
     self.fishingRod = fishingRod
 
-    local fishCatchSound = pd.sound.sampleplayer.new("sound/FishCatch")
-    fishCatchSound:play()
+    self.pageTurnSound = pd.sound.sampleplayer.new("sound/PageTurn")
+    self.scribbleSound = pd.sound.sampleplayer.new("sound/Scribble")
+    self.scribbleSound:play()
 
     local notebookImage = gfx.image.new("images/game/notebook")
     gfx.pushContext(notebookImage)
@@ -52,6 +53,7 @@ function ResultDisplay:update()
         end
     else
         if pd.buttonJustPressed(pd.kButtonA) then
+            self.scribbleSound:play()
             self.animateOut = gfx.animator.new(self.animateTime, 120, -110, pd.easingFunctions.inOutCubic)
         end
     end
