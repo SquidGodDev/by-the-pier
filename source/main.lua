@@ -18,6 +18,10 @@ local gfx <const> = pd.graphics
 math.randomseed(pd.getSecondsSinceEpoch())
 
 CAUGHT_FISH = {}
+local caught_fish = pd.datastore.read()
+if caught_fish then
+    CAUGHT_FISH = caught_fish
+end
 
 SceneManager = SceneManager()
 TitleScene()
@@ -43,4 +47,12 @@ function pd.update()
     if pd.isCrankDocked() and SHOW_CRANK_INDICATOR then
         pd.ui.crankIndicator:update()
     end
+end
+
+function pd.gameWillTerminate()
+    pd.datastore.write(CAUGHT_FISH)
+end
+
+function pd.gameWillSleep()
+    pd.datastore.write(CAUGHT_FISH)
 end

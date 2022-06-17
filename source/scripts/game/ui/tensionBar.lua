@@ -22,11 +22,14 @@ function TensionBar:init(tension, tensionRate, fishingLine)
 
     self.tensionBarRunning = true
 
-    local tensionBarImage = gfx.image.new(self.tensionBarWidth, self.tensionBarHeight)
-    gfx.pushContext(tensionBarImage)
+    self.tensionBarBackground = gfx.image.new(self.tensionBarWidth, self.tensionBarHeight)
+    gfx.pushContext(self.tensionBarBackground)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRoundRect(0, 0, self.tensionBarWidth, self.tensionBarHeight, self.tensionBarCornerRadius)
+        gfx.setColor(gfx.kColorBlack)
         gfx.drawRoundRect(0, 0, self.tensionBarWidth, self.tensionBarHeight, self.tensionBarCornerRadius)
     gfx.popContext()
-    self:setImage(tensionBarImage)
+    self:setImage(self.tensionBarBackground)
 
     local lineBreakIconImage = gfx.image.new("images/game/lineBreakIcon")
     self.lineBreakIcon = gfx.sprite.new(lineBreakIconImage)
@@ -52,9 +55,8 @@ end
 function TensionBar:drawTensionBar()
     local tensionLevelHeight = (self.tension / self.maxTension) * self.tensionBarHeight
     local tensionLevelY = self.tensionBarHeight - tensionLevelHeight
-    local tensionBarImage = gfx.image.new(self.tensionBarWidth, self.tensionBarHeight)
+    local tensionBarImage = self.tensionBarBackground:copy()
     gfx.pushContext(tensionBarImage)
-        gfx.drawRoundRect(0, 0, self.tensionBarWidth, self.tensionBarHeight, self.tensionBarCornerRadius)
         gfx.fillRoundRect(0, tensionLevelY, self.tensionBarWidth, tensionLevelHeight, self.tensionBarCornerRadius)
     gfx.popContext()
     self:setImage(tensionBarImage)

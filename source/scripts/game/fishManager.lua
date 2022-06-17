@@ -9,8 +9,8 @@ function FishManager:init(fishingLine)
     self.fishingLine = fishingLine
 
     self.hooked = false
-    self.hookTimeMin = 1000
-    self.hookTimeMax = 3000
+    self.hookTimeMin = 3000
+    self.hookTimeMax = 10000
     local hookTime = math.random(self.hookTimeMin, self.hookTimeMax)
     self.hookTimer = pd.timer.new(hookTime, function()
         self.hooked = true
