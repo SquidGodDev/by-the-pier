@@ -10,6 +10,7 @@ local gfx <const> = pd.graphics
 class('FishingRod').extends(gfx.sprite)
 
 function FishingRod:init(water)
+    self.accelerometerValues = {}
     self.water = water
     self.handX = 67
     self.handY = 154
