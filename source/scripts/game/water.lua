@@ -1,10 +1,13 @@
+-- Handles drawing the water. Adapted from https://gamedev.stackexchange.com/questions/44547/how-do-i-create-2d-water-with-dynamic-waves
+-- I did a lot of optimizations to make this performant, and it still kinda drops the frames down to like 25-27 fps sometimes
+
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
--- Resolution of simulation
+-- Resolution of simulation (THIS IMPACTS PERFOMANCE A GOOD AMOUNT)
 local NUM_POINTS = 30
 -- Width of simulation
-local WIDTH = 420
+local WIDTH = 420 -- Blaze it
 -- Spring constant for forces applied by adjacent points
 local SPRING_CONSTANT = 0.005
 -- Sprint constant for force applied to baseline
@@ -15,6 +18,7 @@ local Y_OFFSET = 190
 local DAMPING = 0.98
 -- Number of iterations of point-influences-point to do on wave per step
 -- (this makes the waves animate faster)
+-- (THIS IMPACTS PERFORMANCE A DECENT AMOUNT)
 local ITERATIONS = 2
 
 local NUM_BACKGROUND_WAVES = 7
@@ -53,6 +57,9 @@ function Water:init()
     self.wavePoints = self:makeWavePoints(NUM_POINTS)
 end
 
+-- This creates that cool splash effect. Since the wave resolution (NUM_POINTS) isn't
+-- super high for performance reasons, it sometimes splashes to the side of where the hook
+-- is, which is fine for the sake of performance
 function Water:impulse(hookX)
     local closestPoint = nil
     local closestDistance = nil
@@ -76,6 +83,9 @@ function Water:update()
     self.offset = self.offset + 1
     self:updateWavePoints(self.wavePoints)
     local waterImage = gfx.image.new(450, 240 - self.yOffset - 20)
+    -- Couldn't find a good way to optimize the drawing of the wave. I currently have it
+    -- drawing on an image at a fixed height, but ideally the size of the image would dynamically
+    -- change based on the actual size needed to draw the wave to not draw unecessarily
     gfx.pushContext(waterImage)
         for n,p in ipairs(self.wavePoints) do
             if n ~= 1 then
@@ -89,7 +99,12 @@ function Water:update()
                 local rectWidth = x2 - x1
                 local rectX = x1 + rectWidth / 2
                 local rectY = y2
+                -- So I actually draw a bunch of thin white rectangles beneath the wave, to cover
+                -- up the pier stilts and also the fishing line when it goes into the water. This has
+                -- a big performance impact, but I think it's maybe necessary to get that realistic water
+                -- cover up. Definetly a better way to do this
                 gfx.fillRect(rectX, rectY - self.yOffset, rectWidth + 1, rectHeight)
+                -- Actual wave line drawn here
                 gfx.setColor(gfx.kColorBlack)
                 gfx.drawLine(x1, y1 - self.yOffset, x2, y2 - self.yOffset)
             end
@@ -115,6 +130,8 @@ function Water:makeWavePoints(numPoints)
 end
 
 -- Update the positions of each wave point
+-- Basically each point is like a spring and pulls on adjacent points.
+-- IDK just copied the code kekW
 function Water:updateWavePoints(points)
     for i=1,ITERATIONS do
         for n,p in ipairs(points) do
@@ -160,6 +177,8 @@ function Water:updateWavePoints(points)
     end
 end
 
+-- Creates organic looking waves from basically overlapping a
+-- bunch of sine waves. I think. Not sure.
 function Water:overlapSines(x)
     local result = 0
     for i=1,NUM_BACKGROUND_WAVES do

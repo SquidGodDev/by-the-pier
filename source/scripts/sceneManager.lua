@@ -1,3 +1,8 @@
+-- Basically the same as the scene manager from Escape from Complex 32, so I won't re-explain everything, except for
+-- two changes. First is that I made it a wave transition, and second is I made it not a sprite anymore. What I found was
+-- I didn't like having the scene manager itself be a sprite, because if you ever called removeAll on sprites, you would lose
+-- the ability to switch to new scenes and would have to reinstantiate the scene manager. So, I made it so the update method
+-- gets called in main.lua. I think that's much cleaner/better
 
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
@@ -36,9 +41,13 @@ function SceneManager:loadNewScene()
     self.newScene()
 end
 
+-- Not a sprite update method. It gets called in main.lua manually
 function SceneManager:update()
     if self.transitionAnimator then
         local transitionValue = self.transitionAnimator:currentValue()
+        -- To get the wave to move vertically as well as horizontally, I basically created
+        -- an image of a wave that was a little bigger than the screen, and I move it up/down as
+        -- I'm moving it right/left at a rate that is half the horizontal rate
         self.transitionSprite:moveTo(-transitionValue, -transitionValue / 2)
         if self.transitioningIn and self.transitionAnimator:ended() then
             self:loadNewScene()
@@ -63,6 +72,7 @@ function SceneManager:createTransitionSprite(filled)
     self.transitionSprite:add()
 end
 
+-- This handles the ocean waves sound. I found it helpful to make it sort of a global soud
 function SceneManager:playRepeatingSound(soundSample)
     self.repeatingSound = soundSample
     self.repeatingSound:play(0)

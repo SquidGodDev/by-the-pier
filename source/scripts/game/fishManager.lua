@@ -1,3 +1,11 @@
+-- This loads data from fish.json to get info about fish,
+-- which includes the name, flavor text the fish image,
+-- what level the tension bar should be at when the fish
+-- bites, how much the fish should pull on the line, how
+-- long the player has to catch the fish, how often the fish
+-- enters the struggle state, and the mean/variance of the size
+-- of the fish
+
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
@@ -12,6 +20,8 @@ function FishManager:init(fishingLine)
     self.hookTimeMin = 3000
     self.hookTimeMax = 10000
     local hookTime = math.random(self.hookTimeMin, self.hookTimeMax)
+    -- I use this timer to let fishingLine.lua know when a bite occurs.
+    -- Takes between 3 to 10 seconds
     self.hookTimer = pd.timer.new(hookTime, function()
         self.hooked = true
         self:initializeFishData()
@@ -19,6 +29,7 @@ function FishManager:init(fishingLine)
     end)
 end
 
+-- Handles whether or not the fish is struggling
 function FishManager:getStruggleTimer()
     local struggleTime = math.random(self.struggleTimeMin, self.struggleTimeMax)
     if self.struggling then
@@ -30,6 +41,7 @@ function FishManager:getStruggleTimer()
     end)
 end
 
+-- Bite timer gets rest when you move the line. Don't touch the line!
 function FishManager:resetTime()
     self.hookTimer:reset()
 end
@@ -37,6 +49,8 @@ end
 function FishManager:initializeFishData()
     local distance = self.fishingLine.hookX - self.fishingLine.rodX
     local fishOptions
+    -- Different fish live at different distances from the shore. I determine
+    -- how far the line is from the shore and choose a fish based on that
     if distance < 104 then
         fishOptions = fishTable["close"]
     elseif distance < 194 then
@@ -48,6 +62,8 @@ function FishManager:initializeFishData()
     local fishIndex = math.random(1, #fishOptions)
     self.hookedFish = fishOptions[fishIndex]
 
+    -- Slight randomization to the pullStrength, struggleTime, and struggleWait
+    -- +-20% and +-30%
     local pullStrength = self.hookedFish["pullStrength"]
     self.pullStrength = math.random(math.ceil(pullStrength * 0.8 * 100), math.ceil(pullStrength * 1.2 * 100)) / 100
 
@@ -73,6 +89,7 @@ function FishManager:getFishInfo()
     return self.hookedFish
 end
 
+-- Doubles how much the fish pulls on the line if the fish is struggling
 function FishManager:getPullStrength()
     if self.struggling then
         return self.pullStrength * 2
